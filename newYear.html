@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Zodiac Finder</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            overflow: hidden; /* Hide the scrollbars */
+			font-size: 40px;
+        }
+
+		.background {
+			z-index:-1;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* background-image: url('dog.jpg'); */
+            background-size: auto; /* cover */
+            opacity: 0; /* Initially hidden */            
+        }
+		
+		.bg_Dog {
+			background-image: url('dog.jpg');
+			animation: fadeIn 5s forwards;
+		}
+		.bg_Dragon {
+			background-image: url('dragon.jpg');
+			animation: fadeIn 5s forwards;
+		}
+		.bg_Goat {
+			background-image: url('goat.jpg');
+			animation: fadeIn 5s forwards;
+		}
+		.bg_Horse {
+			background-image: url('horse.jpg');
+			animation: fadeIn 5s forwards;
+		}
+		.bg_Monkey {
+			background-image: url('monkey.jpg');
+			animation: fadeIn 5s forwards;
+		}
+		.bg_Ox {
+			background-image: url('ox.jpg');
+			animation: fadeIn 5s forwards;
+		}
+		.bg_Pig {
+			background-image: url('pig.jpg');
+			animation: fadeIn 5s forwards;
+		}
+		.bg_Rabbit {
+			background-image: url('rabbit.jpg');
+			animation: fadeIn 5s forwards;
+		}
+		.bg_Rat {
+			background-image: url('rat.jpg');
+			animation: fadeIn 5s forwards;
+		}
+		.bg_Rooster {
+			background-image: url('rooster.jpg');
+			animation: fadeIn 5s forwards;
+		}
+		.bg_Snake {
+			background-image: url('snake.jpg');
+			animation: fadeIn 5s forwards;
+		}
+		.bg_Tiger {
+			background-image: url('tiger.jpg');
+			animation: fadeIn 5s forwards;
+		}
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 0.4;
+            }
+        }
+		
+        #zodiacContainer {
+            perspective: 1000px; /* Add perspective for 3D effect */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+        }
+
+        .zodiacCard {
+            width: 400px;
+            height: 400px;
+            position: relative;
+            transform-style: preserve-3d; /* Enable 3D transformations */            
+        }
+		
+		.zodiacFlip {
+			animation: flip 2s forwards; /* Flip animation */
+		}
+
+        .zodiacCard .front, .zodiacCard .back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden; /* Hide the backface */
+            color: white; /* Text color */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* White shadow for contrast */
+        }
+
+        .zodiacCard .front {
+            background-color: #DC143C; /* Chinese New Year red background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 160px;
+            font-weight: bold;
+        }
+
+        .zodiacCard .back {
+            background-color: #DC143C; /* Chinese New Year red background */
+            transform: rotateY(180deg); /* Initially flipped */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            font-weight: bold;
+        }
+
+        @keyframes flip {
+            0% { transform: rotateY(0deg); } /* Initial state */
+            100% { transform: rotateY(180deg); } /* Final state */
+        }
+
+        #output {
+            margin-top: 20px;
+        }
+		
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+		
+		.button {
+			padding: 15px 30px;
+			background: radial-gradient(circle, #ffd700, #ff8c00);
+			color: #222;
+			border: none;
+			border-radius: 5px;
+			font-size: 18px;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+		}
+
+		.button:hover {
+			background: radial-gradient(circle, #ff8c00, #b8860b); /* Darker shade of gold on hover */
+		}
+		
+		.button:active {
+			background: radial-gradient(circle, #b8860b, #ffd700); /* Inverted colors when pressed */			
+		}
+		
+		.changingText {
+            transition: opacity 0.5s ease;
+        }
+				
+    </style>
+</head>
+<body>
+	<div id="background" class="background"></div>
+
+    <h1>AI jósgép</h1>
+
+	<div class="button" style="margin:50px;" onclick='startJoslas()'>
+		<h1 id="instructions" class="changingText" >Tedd a kezed az egérre és katt ide</h1>
+	</div>
+	
+    <!--label for="birthDate">Születési dátum:</label-->
+	<div id="bd_input" style="margin:50px;visibility:hidden;">
+		<input type="date" style="font-size:40px;" id="birthDate" name="birthDate">
+        <!--button class="button" onclick="findZodiac()"><h3>Jóslás</h3></button-->
+        <button class="button" onclick="joslasKerdes()"><h3>Jóslás</h3></button>
+	</div>
+
+	<div id="zodiacContainer" style="opacity:0;">
+		<div class="zodiacCard">
+			<div class="front">?</div>
+			<div class="back"></div>
+		</div>
+	</div>
+
+    <!--div id="output">
+	- tedd a kezed az egérre -> gomb: mondja, hogy add meg születési dátumodat -> következő kérdés gomb -> monddja -> várakozik csöndre -> jósol
+	- képek a háttérre
+	- kínai felirat állatokhoz
+	- local.storage - melyik jóslatokat használtuk el
+	- új jóslás indítása
+	</div-->
+
+    <script>
+	
+		var zodiacTranslate = [];
+		zodiacTranslate["Rat"] = "鼠";
+		zodiacTranslate["Ox"] = "牛";
+		zodiacTranslate["Tiger"] = "虎";
+		zodiacTranslate["Rabbit"] = "兔";
+		zodiacTranslate["Dragon"] = "龙";
+		zodiacTranslate["Snake"] = "蛇";
+		zodiacTranslate["Horse"] = "马";
+		zodiacTranslate["Goat"] = "山羊";
+		zodiacTranslate["Monkey"] = "猴";
+		zodiacTranslate["Rooster"] = "鸡";
+		zodiacTranslate["Dog"] = "狗";
+		zodiacTranslate["Pig"] = "猪";
+		
+		var kerdesek = [];
+		kerdesek.push("Melyik elem hordozza a legtöbb üzenetet az életedben jelenleg?");
+		kerdesek.push("Egy nap során melyik pillanatban érzed leginkább a természet energiájának jelenlétét?");
+		kerdesek.push("Melyik szín hozza elő leginkább a belső egyensúlyodat?");
+		kerdesek.push("Melyik évszakban érzed leginkább az elméd tisztaságát és szabadságát?");
+		kerdesek.push("Melyik állat szimbolizálja az erőt és a bölcsességed az életedben?");
+		kerdesek.push("Melyik virág nyitja meg a szíved kapuit és hordozza számodra a szeretet üzenetét?");
+		kerdesek.push("Minek az illata ébreszt benned mély emlékeket és érzéseket?");
+		kerdesek.push("Szoktál zenét hallani az álmaidban?");
+		kerdesek.push("Melyik napszak hozza meg számodra a legtisztább és legélénkebb gondolatokat?");
+		kerdesek.push("Melyik álomkép jelenik meg ismétlődően az elmédben?");
+		kerdesek.push("Melyik fa árnyékában pihensz legszívesebben?");
+		kerdesek.push("Melyik holdfázisban érzed az energiáid legerősebb áramlását?");
+		kerdesek.push("Melyik mesehős a példaképed?");
+		kerdesek.push("Melyik dal jut először eszedbe?");
+		
+		var joslatok = [];
+		joslatok.push("Ahogyan a kígyó lassan siklik át az éjszaka homályán, úgy kél fel egy új hajnal az életedben, melyben a belső erő és a kitartás lesz a vezérfonalad.");
+		joslatok.push("Mint a hegyek ősi bölcsessége, úgy tanítja az elkövetkező idő, hogy a céltudatosság és a hűség ösvényén járva elérheted álmaid csúcsait.");
+		joslatok.push("Ahogyan a távoli hegyekre süt a nap, úgy hozza a jövő neked is a világos és ragyogó lehetőségek fényét, hogy megtaláld az utat a sikeres jövő felé.");
+		joslatok.push("Ahogyan a szél suhanása friss levegőt hoz, úgy hozza a jövő neked a változás szeleit, melyekkel megújíthatod és megerősítheted kapcsolataidat.");
+		joslatok.push("Ahogyan a szél suhanása hűsíti az arcodat, úgy hűsít téged is az elkövetkező időben a megértés és az elfogadás ereje, hogy megtaláld a belső békét.");
+		joslatok.push("Mint a fák lombjai rezegnek a szellőben, úgy rezeg majd benned is a belső bölcsesség és a megértés, hogy megtaláld az utat az életedben.");
+		joslatok.push("Ahogy a virágok csendesen nyílnak a hajnalban, úgy fognak az új lehetőségek és az örömök csodálatosan kibontakozni az életed kertjében.");
+		joslatok.push("Mint a virágok illata betölti a kertet, úgy tölt el téged is az elkövetkező időben a boldogság és a megelégedettség érzése.");
+		joslatok.push("Ahogyan a virágok lassan kibontják szirmaikat, úgy kibontakoznak az elkövetkező időkben az életedben is az új lehetőségek és az örömök, hogy megtapasztald az élet szépségeit.");
+		joslatok.push("Ahogyan a virágok nyílnak a kora reggeli napsütésben, úgy nyílik meg neked is az elkövetkező időben a kreativitás és a fejlődés lehetősége, hogy kiteljesedj és virágozz.");
+		joslatok.push("Ahogyan a hold fénye megvilágítja az éjszakai tájat, úgy fog a belső bölcsesség fénye világítani az elkövetkező idők sötétjében, hogy vezető fényeddel irányt mutass másoknak.");
+		joslatok.push("Mint a holdfázisok váltakozása az égbolton, úgy változnak majd az elkövetkező időkben is az életed kihívásai és lehetőségei, hogy alkalmazkodj és fejlődj.");
+		joslatok.push("Ahogyan a hold sötét árnyéka eltűnik, úgy oldódnak meg az elkövetkező időkben a félelmek és az aggodalmak, hogy helyüket átadják a bizalomnak és a bátorságnak.");
+		joslatok.push("Mint a holdfény simogatja az éjszakai tájat, úgy hoz neked is fényt az elkövetkező időszak, hogy megtaláld az utat a sötétségből a világosság felé.");
+		joslatok.push("Ahogyan a holdfény átszűrődik a lombkoronán, úgy mutat utat Neked is az élet, hogy megtaláld a belső bölcsességed forrását.");
+		joslatok.push("Ahogyan a holdvilág megérinti az éjszakai tájat, úgy hozza el Neked az elkövetkező idő a belső békét és az elengedés érzését, hogy megszabadulj a terhektől.");
+		joslatok.push("Ahogyan a holdfény simogatja az éjszakai tájat, úgy simogat téged is az a békesség és a nyugalom érzése, hogy megtaláld a belső harmóniádat.");
+		joslatok.push("Mint a holdfény simogatja az éjszakai tájat, úgy simogat meg téged is az elkövetkező időszakban a gyógyulás és a felépülés érzése, hogy újra erős és egészséges legyél.");
+		joslatok.push("Mint a folyó örök áramlása, úgy hordozza az élet sodrása az új lehetőségek és kalandok ígéretét, melyek arra várnak, hogy felfedezd és megtapasztald őket.");
+		joslatok.push("Mint a folyó állandó mozgása, úgy hajt előre az elkövetkező időkben téged is az áramlás és a változás ereje, hogy haladj az életedben és elérhesd céljaidat.");
+		joslatok.push("Ahogyan a folyó állandóan folyik a tengerbe, úgy sodor téged is az elkövetkező időben az élet sodra az új kalandok és kihívások felé, hogy fejlődj és tanulj.");
+		joslatok.push("Ahogy a madarak dalolása megörvendezteti a szíveket, úgy hozza a jövő neked is a boldogság és az öröm dallamait, melyek kitöltik majd az életedet.");
+		joslatok.push("Ahogyan a madarak szárnyaikat nyitják és repülnek a magasba, úgy adja meg az elkövetkező idő neked is a szabadság és a szárnyalás lehetőségét, hogy szárnyaid alatt minden határt túlszárnyalhass.");
+		joslatok.push("Ahogyan a madarak fészket raknak a tavaszi reggelen, úgy rakj te is fészket az elkövetkező időben az álmaid és a céljaid megvalósításának fáján, hogy otthonra lelj és biztonságban érezd magad.");
+		joslatok.push("Mint a madarak dalolása, úgy hozza az elkövetkező idő neked is a boldogság és az öröm érzését, hogy megtaláld a zenét az életedben és a szívedben.");
+		joslatok.push("Mint a repülő madarak útja az ég felé, úgy emelkedhetsz te is magasba az elkövetkező időkben, hogy szárnyalj és megvalósítsd az álmaidat.");
+		joslatok.push("Mint a csillagok fénye a sötét égbolton, úgy ragyognak az elkövetkező időkben a remény és a lehetőségek fényei, hogy útmutatást adjanak neked.");
+		joslatok.push("Ahogyan a csillagok fénye vezeti az elveszett hajósokat, úgy vezet téged is az elkövetkező időkben a belső iránytűd, hogy megtaláld az utadat a boldogság és a siker felé.");
+		joslatok.push("Mint a csillagok ragyognak a sötét égbolton, úgy ragyogsz majd te is az elkövetkező időkben, hogy másokat inspirálj és vezess az élet útján.");
+		joslatok.push("Mint a csillagok a végtelen égen, úgy ragyognak az elkövetkező időben a célok és az álmok az életedben, hogy inspiráljanak és vezessenek.");
+		joslatok.push("Mint a tavaszi eső frissíti fel a földet, úgy hozza a jövő neked is az új kezdetek és a megújulás lehetőségét, hogy felvirágozhass és növekedhess.");
+		joslatok.push("Mint a szivárvány ígérete az eső után, úgy jelenik meg az elkövetkező időkben az egyensúly és a harmónia lehetősége, hogy megerősödjön az életedben és a környezetedben.");
+		joslatok.push("Ahogyan a zápor után feltűnik a szivárvány, úgy hozza az elkövetkező idő neked a remény és az optimizmus ígéretét, hogy megéld az életed színes és csodálatos pillanatait.");
+		joslatok.push("Mint a zápor után kibontakozó színek, úgy hozza neked is az elkövetkező idő a sokszínűség és a változatosság lehetőségét, hogy felfedezd az élet szépségeit.");
+		joslatok.push("Ahogyan a naplemente színpompás színei megérintik a lelkeket, úgy érzel majd örömöt és megelégedettséget az elkövetkező idők változásai és fejlődése miatt.");
+		joslatok.push("Mint a tüzes naplemente vörös színei, úgy hozza neked az elkövetkező idő a szenvedélyt és élettel teli energiát, hogy kiteljesedj és boldog legyél.");
+		joslatok.push("Mint a nap sugarai melegítik a földet, úgy melegít meg téged is az elkövetkező időkben a szeretet és az elfogadás érzése, melyek megtöltik majd a szívedet.");
+		joslatok.push("Ahogyan a nap sugarai melegítik a földet, úgy melegít meg téged is az elkövetkező idő a lelki megtisztulás és a belső béke érzése, hogy kiegyensúlyozott és boldog legyél.");
+		joslatok.push("Ahogyan a nap sugarai átmelegítik a földet, úgy melegít fel téged is a szeretet és a barátság érzése, hogy otthonra lelj és szeretve érezd magad.");
+		joslatok.push("Mint a tűz lángja meleget ad a hidegben, úgy leszel te is az emberek életében meleg sugár, aki által megerősödhetnek és felmelegedhetnek a szívek.");
+		joslatok.push("Ahogyan a szikrák repülnek a tűzben, úgy szikrázhatnak fel az új ötletek és lehetőségek benned az elkövetkező időkben.");
+		joslatok.push("Ahogyan a tűz lobbanása melegít egy hideg estén, úgy hozza el neked is a jövő a melegség és a szeretet érzését, hogy megtapasztald az élet igazi örömeit.");
+		joslatok.push("Mint a vadludak őszi vonulása, úgy hozza a jövő neked is az utazás és a felfedezés lehetőségét, melyek révén új tájakat és kultúrákat ismerhetsz meg.");
+		joslatok.push("Ahogyan a hópehely a földre száll, úgy ér el téged az elkövetkező időkben a csodák és a váratlan ajándékok szitáló esője, melyek által még színesebbé válik az életed.");
+		joslatok.push("Ahogyan a hópehely csendesen lebeg a levegőben, úgy hozza neked is az elkövetkező idő a nyugalmat és a békét, hogy megtaláld a belső csendedet.");
+		joslatok.push("Ahogyan a hajnali harmat cseppjei ragyognak a reggeli napsütésben, úgy ragyog az elkövetkező időkben is a kreativitás és a megvilágosodás fénye az életedben.");
+		joslatok.push("Ahogyan a hajnali ébredés új lehetőségeket hoz, úgy hozza az elkövetkező idő is az új kezdeteket és esélyeket, melyek által újraéledhetnek az álmaid.");
+		joslatok.push("Mint az agyag az ujjaid között, úgy változik és formálódik az életed, hogy megtaláld a belső harmóniádat és egyensúlyodat.");
+		joslatok.push("Ahogyan a felhők szétfoszlanak a kék égben, úgy tisztulnak ki a gondolataid és a fejed felett cikázó kérdőjelek, hogy világosan láss és cselekedj.");
+		joslatok.push("Mint a kertész gondozza a növényeket, úgy gondoskodik rólad is az elkövetkező idő, hogy ápolja és fejlessze a lelkedet és a szellemedet.");
+		joslatok.push("Mint a csendes tó tükrözi az eget, úgy tükrözi vissza neked az élet a belső békét és az egyensúlyt, melyet magadban hordozol.");
+		joslatok.push("Ahogyan a tó víztükre tükrözi a körülötte lévő tájat, úgy tükrözi majd az elkövetkező idő neked is a belső valóságodat és az életedet, hogy tisztán láss és megértésre lelj.");
+		joslatok.push("Ahogyan a város élettel teli zajai csendesednek éjszaka, úgy lesznek az elkövetkező időkben olyan pillanatok, amikor elcsendesül a körülötted zajló élet, hogy meghallgasd a belső hangodat.");
+		joslatok.push("Ahogyan a természet álomba ringatja magát a télre, úgy hozza az elkövetkező idő neked is a nyugalom és a regeneráció időszakát, hogy feltöltődj és újult erővel indulj tovább az életedben.");
+		joslatok.push("Mint a hullámok összeérnek a parton, úgy fonódnak össze az elkövetkező időkben is az életed különböző szálai, hogy együtt alkossanak egy harmonikus egészet.");
+		joslatok.push("Mint a vízesés zúgása, úgy hozza az elkövetkező idő neked a lendületet és az előrehaladás erejét, hogy áttörj minden akadályon és elérhesd a célokat.");
+		joslatok.push("Mint a vízesés ereje átjárja a völgyet, úgy árad benned is az elkövetkező időben a belső erő és a céltudatosság, hogy mindent legyőzhess és elérd a céljaidat.");
+		joslatok.push("Mint a tenger mélyén rejtőző gyöngyszem, úgy rejtőzik benned is a sokszínűség és a kreativitás, hogy megtaláld az életed igazi értékeit.");
+		
+		
+		////////////////////////////////////////////////////////////////////////////////////////
+        // Array containing Chinese New Year dates and corresponding Zodiac Animals
+        var newYearAndZodiac = [
+            { date: '1900-01-31', animal: 'Rat' }, { date: '1901-02-19', animal: 'Ox' }, { date: '1902-02-08', animal: 'Tiger' }, { date: '1903-01-29', animal: 'Rabbit' },
+            { date: '1904-02-16', animal: 'Dragon' }, { date: '1905-02-04', animal: 'Snake' }, { date: '1906-01-25', animal: 'Horse' }, { date: '1907-02-13', animal: 'Goat' },
+            { date: '1908-02-02', animal: 'Monkey' }, { date: '1909-01-22', animal: 'Rooster' }, { date: '1910-02-10', animal: 'Dog' }, { date: '1911-01-30', animal: 'Pig' },
+            { date: '1912-02-18', animal: 'Rat' }, { date: '1913-02-06', animal: 'Ox' }, { date: '1914-01-26', animal: 'Tiger' }, { date: '1915-02-14', animal: 'Rabbit' },
+            { date: '1916-02-03', animal: 'Dragon' }, { date: '1917-01-23', animal: 'Snake' }, { date: '1918-02-11', animal: 'Horse' }, { date: '1919-01-31', animal: 'Goat' },
+            { date: '1920-02-20', animal: 'Monkey' }, { date: '1921-02-08', animal: 'Rooster' }, { date: '1922-01-28', animal: 'Dog' }, { date: '1923-02-16', animal: 'Pig' },
+            { date: '1924-02-05', animal: 'Rat' }, { date: '1925-01-24', animal: 'Ox' }, { date: '1926-02-13', animal: 'Tiger' }, { date: '1927-02-02', animal: 'Rabbit' },
+            { date: '1928-01-23', animal: 'Dragon' }, { date: '1929-02-10', animal: 'Snake' }, { date: '1930-01-30', animal: 'Horse' }, { date: '1931-02-17', animal: 'Goat' },
+            { date: '1932-02-06', animal: 'Monkey' }, { date: '1933-01-26', animal: 'Rooster' }, { date: '1934-02-14', animal: 'Dog' }, { date: '1935-02-04', animal: 'Pig' },
+            { date: '1936-01-24', animal: 'Rat' }, { date: '1937-02-11', animal: 'Ox' }, { date: '1938-01-31', animal: 'Tiger' }, { date: '1939-02-19', animal: 'Rabbit' },
+            { date: '1940-02-08', animal: 'Dragon' }, { date: '1941-01-27', animal: 'Snake' }, { date: '1942-02-15', animal: 'Horse' }, { date: '1943-02-05', animal: 'Goat' },
+            { date: '1944-01-25', animal: 'Monkey' }, { date: '1945-02-13', animal: 'Rooster' }, { date: '1946-02-02', animal: 'Dog' }, { date: '1947-01-22', animal: 'Pig' },
+            { date: '1948-02-10', animal: 'Rat' }, { date: '1949-01-29', animal: 'Ox' }, { date: '1950-02-17', animal: 'Tiger' }, { date: '1951-02-06', animal: 'Rabbit' },
+            { date: '1952-01-27', animal: 'Dragon' }, { date: '1953-02-14', animal: 'Snake' }, { date: '1954-02-03', animal: 'Horse' }, { date: '1955-01-24', animal: 'Goat' },
+            { date: '1956-02-12', animal: 'Monkey' }, { date: '1957-01-31', animal: 'Rooster' }, { date: '1958-02-18', animal: 'Dog' }, { date: '1959-02-08', animal: 'Pig' },
+            { date: '1960-01-28', animal: 'Rat' }, { date: '1961-02-15', animal: 'Ox' }, { date: '1962-02-05', animal: 'Tiger' }, { date: '1963-01-25', animal: 'Rabbit' },
+            { date: '1964-02-13', animal: 'Dragon' }, { date: '1965-02-02', animal: 'Snake' }, { date: '1966-01-22', animal: 'Horse' }, { date: '1967-02-09', animal: 'Goat' },
+            { date: '1968-01-30', animal: 'Monkey' }, { date: '1969-02-17', animal: 'Rooster' }, { date: '1970-02-06', animal: 'Dog' }, { date: '1971-01-27', animal: 'Pig' },
+            { date: '1972-02-15', animal: 'Rat' }, { date: '1973-02-03', animal: 'Ox' }, { date: '1974-01-23', animal: 'Tiger' }, { date: '1975-02-11', animal: 'Rabbit' },
+            { date: '1976-01-31', animal: 'Dragon' }, { date: '1977-02-18', animal: 'Snake' }, { date: '1978-02-07', animal: 'Horse' }, { date: '1979-01-28', animal: 'Goat' },
+            { date: '1980-02-16', animal: 'Monkey' }, { date: '1981-02-05', animal: 'Rooster' }, { date: '1982-01-25', animal: 'Dog' }, { date: '1983-02-13', animal: 'Pig' },
+            { date: '1984-02-02', animal: 'Rat' }, { date: '1985-02-20', animal: 'Ox' }, { date: '1986-02-09', animal: 'Tiger' }, { date: '1987-01-29', animal: 'Rabbit' },
+            { date: '1988-02-17', animal: 'Dragon' }, { date: '1989-02-06', animal: 'Snake' }, { date: '1990-01-27', animal: 'Horse' }, { date: '1991-02-15', animal: 'Goat' },
+            { date: '1992-02-04', animal: 'Monkey' }, { date: '1993-01-23', animal: 'Rooster' }, { date: '1994-02-10', animal: 'Dog' }, { date: '1995-01-31', animal: 'Pig' },
+            { date: '1996-02-19', animal: 'Rat' }, { date: '1997-02-07', animal: 'Ox' }, { date: '1998-01-28', animal: 'Tiger' }, { date: '1999-02-16', animal: 'Rabbit' },
+            { date: '2000-02-05', animal: 'Dragon' }, { date: '2001-01-24', animal: 'Snake' }, { date: '2002-02-12', animal: 'Horse' }, { date: '2003-02-01', animal: 'Goat' },
+            { date: '2004-01-22', animal: 'Monkey' }, { date: '2005-02-09', animal: 'Rooster' }, { date: '2006-01-29', animal: 'Dog' }, { date: '2007-02-18', animal: 'Pig' },
+            { date: '2008-02-07', animal: 'Rat' }, { date: '2009-01-26', animal: 'Ox' }, { date: '2010-02-14', animal: 'Tiger' }, { date: '2011-02-03', animal: 'Rabbit' },
+            { date: '2012-01-23', animal: 'Dragon' }, { date: '2013-02-10', animal: 'Snake' }, { date: '2014-01-31', animal: 'Horse' }, { date: '2015-02-19', animal: 'Goat' },
+            { date: '2016-02-08', animal: 'Monkey' }, { date: '2017-01-28', animal: 'Rooster' }, { date: '2018-02-16', animal: 'Dog' }, { date: '2019-02-05', animal: 'Pig' },
+            { date: '2020-01-25', animal: 'Rat' }, { date: '2021-02-12', animal: 'Ox' }, { date: '2022-02-01', animal: 'Tiger' }, { date: '2023-01-22', animal: 'Rabbit' },
+            { date: '2024-02-10', animal: 'Dragon' }
+        ];
+
+				
+		function getRandomInt(usedNumberArr, maxNumber) {
+			var randomNumber = 0;
+			var found = false;
+
+			if (usedNumberArr === null || usedNumberArr.length < maxNumber){
+				while (!found) {
+					randomNumber = Math.floor(Math.random() * maxNumber) + 1; // Generate a random number
+					if (usedNumberArr === null || !usedNumberArr.includes(randomNumber)) { // Check if the number is in the array
+						found = true; // If not, set found to true to exit the loop
+					}
+				}
+			}
+
+			return randomNumber; // Return the random number
+		}
+				
+		// Define threshold for noise detection (adjust as needed)
+		var noiseThreshold = 10;
+
+	
+		var localStorageUID = 20240210;
+
+		var usedJoslat = [];
+		usedJoslat = JSON.parse(localStorage.getItem(localStorageUID+"joslat"));
+		if (usedJoslat == null){
+			usedJoslat = [];
+		}
+		
+		var usedKerdes = [];
+		usedKerdes = JSON.parse(localStorage.getItem(localStorageUID+"kerdes"));
+		if (usedKerdes == null){
+			usedKerdes = [];
+		}
+		
+		var stat = 0;
+	
+		///első lépés
+		function startJoslas(){
+			
+			if (stat == 0){
+				stat = 1;
+				
+				speak("Írd be a születési dátumodat, és nyomd meg a jóslás gombot");
+			
+				var textElement = document.getElementById("instructions");
+				textElement.style.opacity = "0"; // Fade out the text
+				setTimeout(function() {
+					// Change the text content
+					textElement.textContent = "Írd be a születési dátumodat, és nyomd meg a jóslás gombot";				
+					textElement.style.opacity = "1"; // Fade in the new text
+				}, 500); // Adjust the delay to match the transition duration
+			}
+			
+		}
+	
+		//kérdés feltevése
+		function joslasKerdes(){
+			
+			if (stat == 1){
+				stat = 2;
+				
+				speak("Elkezdem a jóslást, ne engedd el az egeret!");
+				speak("Válaszolj a következő kérdésre a mikrofonba.");
+				
+				var kerdesID = getRandomInt(usedKerdes, kerdesek.length);
+				
+				stat = 3;
+				speak(kerdesek[kerdesID-1]);
+				
+				//elmentjük a feltett kérdést
+				usedKerdes.push(kerdesID-1);
+				if (usedKerdes.length == kerdesek.length){
+					localStorage.setItem(localStorageUID+"kerdes", JSON.stringify([]));
+				}else{
+					localStorage.setItem(localStorageUID+"kerdes", JSON.stringify(usedKerdes));
+				}
+				
+				
+			}			
+		
+		}
+	
+		//////////////////////////////////////////////////////////////////////////////
+		// Init voices array
+	    const synth = window.speechSynthesis;
+
+		var voices = [];
+
+		function getVoices() {
+		  voices = synth.getVoices();
+		  console.log(voices);
+		};
+
+		getVoices();
+		if (speechSynthesis.onvoiceschanged !== undefined) {
+		  speechSynthesis.onvoiceschanged = voices;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////
+		//Speak
+		const speak = (mitMondjak) => {
+
+		  if (voices.length == 0) {
+			getVoices();
+		  }
+
+		  // Check if speaking
+		  if (synth.speaking) {
+			console.error("already speaking");
+			return;
+		  }
+		  if (mitMondjak !== "") {
+
+			//Get text to speak
+			const speakText = new SpeechSynthesisUtterance(mitMondjak);
+
+			//Speak end
+			speakText.onend = e => {
+				//TODO várakozás, hogy befejezze a mondatot user
+			};
+
+			//Speak error
+			speakText.onerror = e => {
+			  console.error("Something went wrong...");
+			};
+
+			//Speak end
+			speakText.onend = e => {
+
+				//stat 0 - még nem lett megnyomva a gomb
+				//stat 1 - megnyomta user, várunk a születési dátumra
+				if (stat == 1){
+					//show input field
+					document.getElementById("bd_input").style.visibility = "visible";
+				}
+				//stat 2 - kérdés feltevés
+				//stat 3 - válasz várás
+				if (stat == 3){
+					
+					//várakozás, hogy ne legyen zaj
+					stat = 4;
+				}
+				
+
+			};
+			
+			//Selected voice - pl.: voices[3].name
+			const selectedVoice = "Microsoft Szabolcs - Hungarian (Hungary)";
+
+			//Loop through the voices
+			voices.forEach(voice => {
+			  if (voice.name === selectedVoice) {
+				speakText.voice = voice;
+			  }
+			});
+
+			//Set pitch and rate
+			//speakText.pitch = getRand(0.5, 2);
+			//speakText.rate = getRand(0.8, 1.1);
+			//speakText.rate = 1; //0,5 - 2
+			//speakText.pitch = 1; // 0 - 2
+
+			//Speak
+			synth.speak(speakText);
+		  }
+		};
+
+
+        function findZodiac() {
+
+			//vége a folyamatnak
+			stat = 5;
+		
+			//felolvasunk egy random még nem hallott jóslatot			
+			var joslatID = getRandomInt(usedJoslat, joslatok.length);
+				
+			var joslat = joslatok[joslatID];
+			
+			//felovlasás
+			speak(joslat);
+			
+			//kiírás
+			var textElement = document.getElementById("instructions");
+			textElement.style.opacity = "0"; // Fade out the text
+			setTimeout(function() {
+				// Change the text content
+				textElement.textContent = joslat;				
+				textElement.style.opacity = "1"; // Fade in the new text
+			}, 500); // Adjust the delay to match the transition duration
+			
+			
+			//elmentjük a feltett kérdést
+			usedJoslat.push(joslatID-1);
+			if (usedJoslat.length == joslatok.length){
+				localStorage.setItem(localStorageUID+"joslat", JSON.stringify([]));
+			}else{
+				localStorage.setItem(localStorageUID+"joslat", JSON.stringify(usedJoslat));
+			}
+		
+			//megjelenik a kártya
+			var element = document.getElementById("zodiacContainer");
+			element.style.transition = "opacity 1s ease";
+			element.style.opacity = "3";
+
+			//kicsit várunk, és megfordul a káryta
+			setTimeout(function(){
+				var birthDate = new Date(document.getElementById("birthDate").value);
+				var zodiacAnimal = getZodiacAnimal(birthDate);
+				displayZodiac(zodiacAnimal);
+			}, 5000);
+		
+        }
+
+        function getZodiacAnimal(birthDate) {
+            var birthYear = birthDate.getFullYear();
+            var birthMonth = birthDate.getMonth() + 1;
+            var birthDay = birthDate.getDate();
+            
+            // Iterate over each Chinese New Year
+            for (var i = 0; i < newYearAndZodiac.length; i++) {
+                var newYearDate = new Date(newYearAndZodiac[i].date);
+                
+                if (birthDate >= newYearDate) {
+                    // Check if birth date falls within the range of this Chinese New Year
+                    if (i + 1 < newYearAndZodiac.length) {
+                        var nextYearDate = new Date(newYearAndZodiac[i + 1].date);
+                        if (birthDate < nextYearDate) {
+                            return newYearAndZodiac[i].animal;
+                        }
+                    } else {
+                        return newYearAndZodiac[i].animal;
+                    }
+                }
+            }
+            
+            return "Zodiac not found for this date";
+        }
+
+        function displayZodiac(zodiacAnimal) {			
+            var zodiacContainer = document.getElementById("zodiacContainer");
+            zodiacContainer.innerHTML = "";
+            
+            var zodiacCard = document.createElement("div");
+            zodiacCard.className = "zodiacCard";
+
+            var frontFace = document.createElement("div");
+            frontFace.className = "front";
+            frontFace.textContent = "?"; // Initial state
+
+            var backFace = document.createElement("div");
+            backFace.className = "back";
+            backFace.innerHTML = zodiacAnimal; // Zodiac revealed
+			backFace.innerHTML += "<br>" + zodiacTranslate[zodiacAnimal];
+
+            zodiacCard.appendChild(frontFace);
+            zodiacCard.appendChild(backFace);
+
+            zodiacContainer.appendChild(zodiacCard);
+			
+			document.querySelector('.zodiacCard').classList.add('zodiacFlip');
+			
+			//background
+			document.querySelector('.background').classList.add('bg_' + zodiacAnimal);
+        }
+		
+// Access the microphone and monitor noise level
+navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function(stream) {
+        var audioContext = new AudioContext();
+        var mediaStreamSource = audioContext.createMediaStreamSource(stream);
+        var analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048; // FFT size for frequency analysis
+        var bufferLength = analyser.frequencyBinCount;
+        var dataArray = new Uint8Array(bufferLength);
+        var noiseDetected = false; // Flag to track noise detection
+        var silenceTimeout; // Timeout for waiting in silence
+
+        // Connect microphone stream to analyser
+        mediaStreamSource.connect(analyser);
+
+        // Function to continuously monitor noise level
+        function monitorNoiseLevel() {
+		
+	
+			// Get current audio data
+			analyser.getByteFrequencyData(dataArray);
+
+			// Calculate average volume level
+			var averageVolume = getAverageVolume(dataArray);
+
+			// Log noise level (optional)
+			//console.log('Current noise level:', averageVolume);
+			
+			//console.log(stat);
+			//várakozunk, hogy csönd legyen
+			if (stat == 4){
+
+				if (!noiseDetected && averageVolume > noiseThreshold) {
+					// Noise detected for the first time
+					console.log('Noise detected!');
+
+					// Clear existing timeout if present
+					if (silenceTimeout) {
+						clearTimeout(silenceTimeout);
+						silenceTimeout = null; // Reset the timeout variable
+					}
+
+					// Set noise detection flag
+					noiseDetected = true;
+				} else if (noiseDetected && averageVolume <= noiseThreshold) {
+					noiseDetected = false;
+					// Noise has stopped
+					console.log('Noise stopped!');
+
+					// Clear existing timeout if present
+					if (silenceTimeout) {
+						clearTimeout(silenceTimeout);
+					}
+
+					// Set timeout to wait for silence before flipping the card (adjust as needed)
+					silenceTimeout = setTimeout(function() {
+						// Flip the card
+						findZodiac();
+
+						// Reset noise detection flag and timeout                    
+						silenceTimeout = null;
+					}, 3000); // Wait for 3 seconds of silence before flipping the card
+				}
+			}
+
+			// Schedule next monitoring
+			requestAnimationFrame(monitorNoiseLevel);
+
+        }
+
+        // Start monitoring noise level
+        monitorNoiseLevel();
+    })
+    .catch(function(err) {
+        console.error('Error accessing microphone:', err);
+    });
+
+// Function to calculate average volume level
+function getAverageVolume(array) {
+    var sum = 0;
+    var length = array.length;
+    for (var i = 0; i < length; i++) {
+        sum += array[i];
+    }
+    // Calculate average volume
+    var averageVolume = sum / length;
+    return averageVolume;
+}
+
+
+    </script>
+</body>
+</html>
