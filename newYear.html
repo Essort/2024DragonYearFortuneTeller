@@ -340,6 +340,23 @@
             { date: '2024-02-10', animal: 'Dragon' }
         ];
 
+		function isDateBefore(dateString, referenceDate) {
+			// Convert date strings to Date objects
+			var date = new Date(dateString);
+			var reference = new Date(referenceDate);
+
+			// Compare dates
+			return date < reference;
+		}
+
+		function isDateAfter(dateString, referenceDate) {
+			// Convert date strings to Date objects
+			var date = new Date(dateString);
+			var reference = new Date(referenceDate);
+
+			// Compare dates
+			return date > reference;
+		}
 				
 		function getRandomInt(usedNumberArr, maxNumber) {
 			var randomNumber = 0;
@@ -347,7 +364,7 @@
 
 			if (usedNumberArr === null || usedNumberArr.length < maxNumber){
 				while (!found) {
-					randomNumber = Math.floor(Math.random() * maxNumber) + 1; // Generate a random number
+					randomNumber = Math.floor(Math.random() * maxNumber); // Generate a random number
 					if (usedNumberArr === null || !usedNumberArr.includes(randomNumber)) { // Check if the number is in the array
 						found = true; // If not, set found to true to exit the loop
 					}
@@ -399,28 +416,84 @@
 		//kérdés feltevése
 		function joslasKerdes(){
 			
+			var datumOk = true;
+			
 			if (stat == 1){
+				if (document.getElementById("birthDate").value == ""){
+					speak("JÉZUS?? Te vagy az?! Ha nem akkor add meg az igazi születési dátumodat");
+					
+					datumOk = false;
+					
+					var textElement = document.getElementById("instructions");
+					textElement.style.opacity = "0"; // Fade out the text
+					setTimeout(function() {
+						// Change the text content
+						textElement.textContent = "JÉZUS?? Te vagy az?! Ha nem akkor add meg az igazi születési dátumodat";				
+						textElement.style.opacity = "1"; // Fade in the new text
+					}, 500); // Adjust the delay to match the transition duration
+
+				}
+				
+				if (isDateBefore(document.getElementById("birthDate").value, "1900-01-31")){
+					
+					datumOk = false;
+				
+					speak("Tudom ám hogy nem vagy olyan öreg. Add meg igazi születési dátumodat");
+					
+					var textElement = document.getElementById("instructions");
+					textElement.style.opacity = "0"; // Fade out the text
+					setTimeout(function() {
+						// Change the text content
+						textElement.textContent = "Tudom ám hogy nem vagy olyan öreg. Add meg igazi születési dátumodat";				
+						textElement.style.opacity = "1"; // Fade in the new text
+					}, 500); // Adjust the delay to match the transition duration
+				}
+				
+				if (isDateAfter(document.getElementById("birthDate").value, "2024-02-10")){
+					
+					datumOk = false;
+				
+					speak("Én sem ma születtem. Tudom hogy te sem a jövőben. Add meg az igazi születési dátumodat");
+					
+					var textElement = document.getElementById("instructions");
+					textElement.style.opacity = "0"; // Fade out the text
+					setTimeout(function() {
+						// Change the text content
+						textElement.textContent = "Én sem ma születtem. Tudom hogy te sem a jövőben. Add meg az igazi születési dátumodat";				
+						textElement.style.opacity = "1"; // Fade in the new text
+					}, 500); // Adjust the delay to match the transition duration
+				}
+			}
+			
+			if (stat == 1 && datumOk){
 				stat = 2;
+				
+				document.getElementById("birthDate").disabled = true;
 				
 				speak("Elkezdem a jóslást, ne engedd el az egeret!");
 				speak("Válaszolj a következő kérdésre a mikrofonba.");
 				
+				var textElement = document.getElementById("instructions");
+				textElement.style.opacity = "0"; // Fade out the text
+				setTimeout(function() {
+					// Change the text content
+					textElement.textContent = "Elkezdem a jóslást, ne engedd el az egeret! Válaszolj a következő kérdésre a mikrofonba.";				
+					textElement.style.opacity = "1"; // Fade in the new text
+				}, 500); // Adjust the delay to match the transition duration
+				
 				var kerdesID = getRandomInt(usedKerdes, kerdesek.length);
 				
 				stat = 3;
-				speak(kerdesek[kerdesID-1]);
+				speak(kerdesek[kerdesID]);
 				
 				//elmentjük a feltett kérdést
-				usedKerdes.push(kerdesID-1);
+				usedKerdes.push(kerdesID);
 				if (usedKerdes.length == kerdesek.length){
 					localStorage.setItem(localStorageUID+"kerdes", JSON.stringify([]));
 				}else{
 					localStorage.setItem(localStorageUID+"kerdes", JSON.stringify(usedKerdes));
-				}
-				
-				
-			}			
-		
+				}		
+			}		
 		}
 	
 		//////////////////////////////////////////////////////////////////////////////
@@ -533,7 +606,7 @@
 			
 			
 			//elmentjük a feltett kérdést
-			usedJoslat.push(joslatID-1);
+			usedJoslat.push(joslatID);
 			if (usedJoslat.length == joslatok.length){
 				localStorage.setItem(localStorageUID+"joslat", JSON.stringify([]));
 			}else{
